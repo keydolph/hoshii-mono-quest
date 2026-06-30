@@ -40,7 +40,7 @@
         <button class="edit-link" id="btn-edit-list"><span class="icon-slot icon-inline" data-icon="edit"></span> 編集</button>
       </div>
       <ol class="quest-list" id="today-quest-list"></ol>
-      <p class="hint-text">▲▼ で並び替え</p>
+      <p class="hint-text" id="home-reorder-hint">▲▼ で並び替え</p>
     </section>
 
     <section class="card streak-card">
@@ -61,7 +61,7 @@
           <p>現在地：<span class="accent-mint" id="home-currentPref">-</span></p>
           <p class="map-mini-pct"><span id="home-prefPct">0</span>%</p>
           <p class="map-mini-sub">次のスポット：<span id="home-nextSpot">-</span></p>
-          <p class="map-mini-sub">岩手県まであと <span class="accent-gold" id="home-expToNext">0</span>EXP</p>
+          <p class="map-mini-sub"><span id="home-nextPref">-</span>まであと <span class="accent-gold" id="home-expToNext">0</span>EXP</p>
         </div>
         <div class="map-mini-visual">
           <svg viewBox="0 0 160 200" id="home-map-svg"></svg>
@@ -528,6 +528,7 @@
     <section class="card">
       <h2 class="card-heading">データを管理</h2>
       <div class="form-actions">
+        <button type="button" class="ghost-btn" id="settings-fresh-btn">最初から始める</button>
         <button type="button" class="ghost-btn" id="settings-demo-btn">デモデータに戻す</button>
         <button type="button" class="danger-btn" id="settings-wipe-btn">全データを削除する</button>
       </div>

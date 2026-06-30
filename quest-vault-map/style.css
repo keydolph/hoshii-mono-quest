@@ -921,3 +921,25 @@ button{cursor:pointer;}
   text-align:center;
   margin:4px 0 0;
 }
+
+/* ---------- home empty state ---------- */
+.quest-empty-state{
+  list-style:none;
+  padding:18px 0 10px;
+  text-align:center;
+}
+.quest-empty-text{
+  font-size:13px;
+  color:var(--text-faint);
+  margin:0 0 14px;
+}
+.quest-empty-btns{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+}
+.quest-empty-btns .ghost-btn{
+  width:auto;
+  padding:10px 20px;
+  font-size:13px;
+}

@@ -114,7 +114,75 @@
     return new Date().toISOString();
   }
 
-  function defaultState() {
+  function createFreshState() {
+    var now = nowIso();
+    return {
+      totalExp: 0,
+      streak: {
+        currentDays: 0,
+        weekCompleted: [false, false, false, false, false, false, false],
+        lastCompletedDate: ""
+      },
+      quests: [
+        { id: uid("fs"), title: "8小節だけ作る", category: "本命", difficulty: "中", minutes: 20, exp: 150, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "10分だけ作業する", category: "本命", difficulty: "低", minutes: 10, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "1フレーズだけ書く", category: "本命", difficulty: "低", minutes: 5, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "支払い確認", category: "守り", difficulty: "中", minutes: 3, exp: 150, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "明日の予定を見る", category: "守り", difficulty: "低", minutes: 2, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "連絡を1つ返す", category: "守り", difficulty: "低", minutes: 3, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "机の上を3分整える", category: "整え", difficulty: "低", minutes: 3, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "洗濯を回す", category: "整え", difficulty: "低", minutes: 2, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "水を飲む", category: "整え", difficulty: "低", minutes: 1, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "10分だけ散歩する", category: "整え", difficulty: "低", minutes: 10, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "500円を金庫に移す", category: "お金", difficulty: "低", minutes: 2, exp: 50, moneyEffect: "deposit", amount: 500, usageCount: 0, hidden: false, inToday: false, order: 0, vaultId: "v1", createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "コンビニを見送る", category: "お金", difficulty: "低", minutes: 1, exp: 50, moneyEffect: "saved", amount: 380, usageCount: 0, hidden: false, inToday: false, order: 0, vaultId: "v1", createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "買う前に1日置く", category: "お金", difficulty: "中", minutes: 1, exp: 150, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "サブスクを1つ確認する", category: "お金", difficulty: "低", minutes: 5, exp: 50, moneyEffect: "saved", amount: 450, usageCount: 0, hidden: false, inToday: false, order: 0, vaultId: "v1", createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "アプリを開くだけ", category: "超軽", difficulty: "低", minutes: 1, exp: 30, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "メモを1行だけ書く", category: "超軽", difficulty: "低", minutes: 1, exp: 30, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "1分だけ片付ける", category: "超軽", difficulty: "低", minutes: 1, exp: 30, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "深呼吸する", category: "超軽", difficulty: "低", minutes: 1, exp: 30, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, createdAt: now, updatedAt: now }
+      ],
+      vaults: [
+        {
+          id: "v1",
+          title: "外付けSSDの金庫",
+          targetAmount: 80000,
+          currentAmount: 0,
+          savedAmountThisMonth: 0,
+          depositedThisMonth: 0,
+          savedDeltaPct: 0,
+          depositedDeltaPct: 0,
+          milestoneStepIndex: 0,
+          milestones: [
+            { label: "作成", amount: 0 },
+            { label: "下見", amount: 20000 },
+            { label: "候補決定", amount: 40000 },
+            { label: "購入準備", amount: 60000 },
+            { label: "購入可能", amount: 80000 }
+          ],
+          benefits: ["制作データを逃がせる", "容量不安が減る", "制作環境が軽くなる"]
+        }
+      ],
+      mapProgress: {
+        currentPrefecture: "北海道",
+        prefectureProgress: 0,
+        currentRegion: "北海道",
+        regionCompleted: 0,
+        regionTotal: 1,
+        nextSpot: "ラベンダー畑",
+        nextPrefecture: "青森県",
+        expToNextSpot: 500,
+        totalDistanceKm: 0,
+        logs: [],
+        souvenirs: []
+      },
+      history: [],
+      weekStats: { exp: 0, questCount: 0, saved: 0, deposited: 0 }
+    };
+  }
+
+  function createDemoState() {
     var now = nowIso();
     var yesterday = new Date(Date.now() - 23 * 3600 * 1000 - 40 * 60 * 1000).toISOString();
     var yesterdayEarlier = new Date(Date.now() - 25 * 3600 * 1000 - 10 * 60 * 1000).toISOString();
@@ -219,12 +287,12 @@
   function loadState() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return defaultState();
+      if (!raw) return createFreshState();
       var parsed = JSON.parse(raw);
-      if (!parsed || !parsed.quests) return defaultState();
+      if (!parsed || !parsed.quests) return createFreshState();
       return parsed;
     } catch (e) {
-      return defaultState();
+      return createFreshState();
     }
   }
 
@@ -270,7 +338,7 @@
   }
 
   function normalizeState() {
-    var defaults = defaultState();
+    var defaults = createDemoState();
     if (!Array.isArray(state.quests)) state.quests = [];
     state.quests = state.quests.filter(function (q) { return q && typeof q === "object"; });
     if (!Array.isArray(state.vaults) || state.vaults.length === 0) state.vaults = cloneDefault(defaults.vaults);
@@ -533,6 +601,21 @@
       });
     });
 
+    if (quests.length === 0) {
+      var emptyLi = document.createElement("li");
+      emptyLi.className = "quest-empty-state";
+      emptyLi.innerHTML =
+        '<p class="quest-empty-text">今日のクエストはまだありません</p>' +
+        '<div class="quest-empty-btns">' +
+        '<button class="ghost-btn quest-empty-go-shelf">クエスト棚</button>' +
+        '<button class="ghost-btn quest-empty-go-add">＋ 追加</button>' +
+        '</div>';
+      list.appendChild(emptyLi);
+      emptyLi.querySelector(".quest-empty-go-shelf").addEventListener("click", function () { showScreen("shelf"); });
+      emptyLi.querySelector(".quest-empty-go-add").addEventListener("click", function () { openForm(null); });
+    }
+    document.getElementById("home-reorder-hint").classList.toggle("hidden", quests.length === 0);
+
     document.getElementById("home-streakDays").textContent = state.streak.currentDays;
     var weekCompletedCount = state.streak.weekCompleted.filter(Boolean).length;
     document.getElementById("home-weekCount").textContent = weekCompletedCount + "/" + state.streak.weekCompleted.length;
@@ -543,6 +626,7 @@
     document.getElementById("home-prefPct").textContent = mp.prefectureProgress;
     document.getElementById("home-nextSpot").textContent = mp.nextSpot;
     document.getElementById("home-expToNext").textContent = mp.expToNextSpot;
+    document.getElementById("home-nextPref").textContent = mp.nextPrefecture || "次";
     buildMapSvg(document.getElementById("home-map-svg"), 160, 200, false);
 
     var vault = state.vaults[0];
@@ -1365,9 +1449,18 @@
     showScreen("home");
   });
 
+  document.getElementById("settings-fresh-btn").addEventListener("click", function () {
+    if (!confirm("最初から始めます。現在のデータは失われます。よろしいですか？")) return;
+    state = createFreshState();
+    normalizeState();
+    saveState();
+    showToast("最初から始めました");
+    showScreen("home");
+  });
+
   document.getElementById("settings-demo-btn").addEventListener("click", function () {
     if (!confirm("デモデータに戻します。現在のデータは失われます。よろしいですか？")) return;
-    state = defaultState();
+    state = createDemoState();
     normalizeState();
     saveState();
     showScreen("home");
@@ -1376,7 +1469,7 @@
   document.getElementById("settings-wipe-btn").addEventListener("click", function () {
     if (!confirm("すべてのデータを削除します。この操作は元に戻せません。本当に削除しますか？")) return;
     localStorage.removeItem(STORAGE_KEY);
-    state = defaultState();
+    state = createFreshState();
     normalizeState();
     showScreen("home");
   });
