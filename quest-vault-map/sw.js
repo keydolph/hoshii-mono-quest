@@ -2,7 +2,7 @@
 
 // バージョン更新時はここを上げる（例: v3 → v4）
 // キャッシュ名が変わると activate 時に旧キャッシュが自動削除される
-var CACHE_NAME = "quest-vault-map-v3";
+var CACHE_NAME = "quest-vault-map-v4";
 var CORE_ASSETS = [
   "./",
   "./index.html",

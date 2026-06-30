@@ -943,3 +943,30 @@ button{cursor:pointer;}
   padding:10px 20px;
   font-size:13px;
 }
+
+/* ── condition card ── */
+.condition-score-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px;}
+.condition-score-btn{background:var(--bg-card-2);border:1px solid var(--border-soft);color:var(--text-dim);font-size:16px;font-weight:600;padding:10px 4px;border-radius:8px;}
+.condition-set-row{display:flex;align-items:center;gap:12px;margin-top:8px;}
+.condition-score-badge{font-size:28px;font-weight:700;color:var(--gold);line-height:1;flex-shrink:0;}
+.condition-score-denom{font-size:14px;color:var(--text-dim);font-weight:400;}
+.condition-info{flex:1;}
+.condition-label{font-size:13px;color:var(--text-cream);font-weight:600;margin:0 0 2px;}
+.condition-range{font-size:12px;color:var(--text-dim);margin:0;}
+.condition-change-btn{width:auto !important;padding:6px 12px !important;font-size:12px !important;flex-shrink:0;}
+/* ── difficulty chips ── */
+.quest-diff-row{display:flex;gap:5px;align-items:center;margin-top:3px;}
+.diff-chip{display:inline-flex;align-items:center;font-size:11px;color:var(--text-dim);background:var(--bg-card-2);border:1px solid var(--border-soft);border-radius:999px;padding:1px 6px;}
+.diff-fit-chip{display:inline-flex;align-items:center;font-size:11px;border-radius:999px;padding:1px 7px;font-weight:600;}
+.diff-fit-chip.diff-match{color:var(--mint);background:rgba(111,217,173,0.12);}
+.diff-fit-chip.diff-heavy{color:var(--gold);background:rgba(217,179,95,0.12);}
+.diff-fit-chip.diff-light{color:var(--text-dim);background:var(--bg-card-2);}
+/* ── eval card ── */
+.eval-pred-label{font-size:12px;color:var(--text-faint);margin:0 0 10px;}
+.diff-eval-btns{display:flex;gap:8px;}
+.diff-eval-btn{flex:1;background:var(--bg-card-2);border:1px solid var(--border-soft);color:var(--text-cream);font-size:13px;font-weight:600;padding:10px 4px;border-radius:var(--radius-sm);}
+.diff-eval-btn:disabled{opacity:0.4;}
+.diff-eval-result{font-size:13px;color:var(--mint);text-align:center;margin:8px 0 0;font-weight:600;}
+.diff-eval-suggestion{font-size:12px;color:var(--text-dim);text-align:center;margin:6px 0 0;}
+/* ── pill-select wrap ── */
+.pill-select.wrap{flex-wrap:wrap;}
