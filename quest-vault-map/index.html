@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a0f1a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="クエスト金庫">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<title>クエストボード</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ===================== HOME ===================== -->
+  <section class="screen" id="screen-home">
+    <header class="topbar">
+      <div class="exp-chip">
+        <span class="exp-icon">EXP</span>
+        <span class="exp-label">累計EXP</span>
+        <span class="exp-value" id="home-totalExp">0</span>
+      </div>
+      <button class="icon-btn bell-btn" aria-label="通知">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 2a6 6 0 0 0-6 6v3.6c0 .9-.35 1.77-.98 2.4L4 15v1h16v-1l-1.02-1c-.63-.63-.98-1.5-.98-2.4V8a6 6 0 0 0-6-6zm0 20a2.2 2.2 0 0 0 2.2-2H9.8A2.2 2.2 0 0 0 12 22z" fill="currentColor"/></svg>
+        <span class="bell-dot"></span>
+      </button>
+    </header>
+
+    <h1 class="page-title">今日のクエスト</h1>
+
+    <section class="card quest-list-card">
+      <div class="card-head">
+        <h2 class="card-heading">クエストリスト</h2>
+        <span class="order-pill">今やる順 <svg viewBox="0 0 24 24" width="12" height="12"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none"/></svg></span>
+        <button class="edit-link" id="btn-edit-list"><span class="icon-slot icon-inline" data-icon="edit"></span> 編集</button>
+      </div>
+      <ol class="quest-list" id="today-quest-list"></ol>
+      <p class="hint-text">▲▼ で並び替え</p>
+    </section>
+
+    <section class="card streak-card">
+      <div class="streak-head">
+        <div>
+          <span class="card-heading">連続記録</span>
+          <div class="streak-days"><span id="home-streakDays">0</span>日</div>
+        </div>
+        <div class="streak-week">今週 <span id="home-weekCount">0/0</span></div>
+      </div>
+      <div class="lantern-row" id="lantern-row"></div>
+    </section>
+
+    <section class="card map-mini-card" id="home-map-card">
+      <h2 class="card-heading">前進マップ</h2>
+      <div class="map-mini-row">
+        <div class="map-mini-info">
+          <p>現在地：<span class="accent-mint" id="home-currentPref">-</span></p>
+          <p class="map-mini-pct"><span id="home-prefPct">0</span>%</p>
+          <p class="map-mini-sub">次のスポット：<span id="home-nextSpot">-</span></p>
+          <p class="map-mini-sub">岩手県まであと <span class="accent-gold" id="home-expToNext">0</span>EXP</p>
+        </div>
+        <div class="map-mini-visual">
+          <svg viewBox="0 0 160 200" id="home-map-svg"></svg>
+        </div>
+      </div>
+    </section>
+
+    <div class="row-cards">
+      <section class="card vault-mini-card" id="home-vault-card">
+        <div class="vault-mini-head">
+          <p class="vault-mini-title" id="home-vaultTitle">金庫</p>
+          <span class="chevron">›</span>
+        </div>
+        <div class="vault-mini-visual" id="home-vault-visual"></div>
+        <p class="vault-mini-amount"><span id="home-vaultCurrent">0</span></p>
+        <p class="vault-mini-target">/ <span id="home-vaultTarget">0</span></p>
+        <div class="bar-track"><div class="bar-fill" id="home-vaultBar"></div></div>
+        <p class="vault-mini-rest">あと ¥<span id="home-vaultRest">0</span></p>
+      </section>
+
+      <section class="card saved-mini-card">
+        <div class="saved-mini-icon icon-slot" data-icon="shield"></div>
+        <div class="saved-mini-body">
+          <p class="saved-mini-title">今月守った額</p>
+          <p class="saved-mini-amount">¥<span id="home-savedMonth">0</span></p>
+        </div>
+      </section>
+    </div>
+
+    <div class="quick-actions">
+      <button class="quick-btn" id="btn-quick-add">＋ クエスト追加</button>
+      <button class="quick-btn" id="btn-quick-shelf"><span class="icon-slot icon-inline" data-icon="quest"></span> クエスト棚</button>
+      <button class="quick-btn" id="btn-quick-review"><span class="icon-slot icon-inline" data-icon="record"></span> 振り返り</button>
+    </div>
+    <div class="quick-actions quick-actions-money">
+      <button class="quick-btn quick-btn-money" id="btn-quick-deposit"><span class="icon-slot icon-inline" data-icon="coin"></span> 金庫に積む</button>
+      <button class="quick-btn quick-btn-money" id="btn-quick-saved"><span class="icon-slot icon-inline" data-icon="shield"></span> 守った額を記録</button>
+    </div>
+  </section>
+
+  <!-- ===================== QUEST SHELF ===================== -->
+  <section class="screen hidden" id="screen-shelf">
+    <header class="topbar topbar-simple">
+      <h1 class="page-title small">クエスト棚</h1>
+      <span class="count-pill">保存数 <b id="shelf-count">0</b></span>
+    </header>
+
+    <div class="tab-row">
+      <button class="tab-btn active" data-shelf-tab="favorite"><span class="icon-slot icon-inline" data-icon="star"></span> よく使う</button>
+      <button class="tab-btn" data-shelf-tab="history"><span class="icon-slot icon-inline" data-icon="clock"></span> 使用履歴</button>
+      <button class="tab-btn" data-shelf-tab="hidden"><span class="icon-slot icon-inline" data-icon="hidden"></span> 非表示</button>
+    </div>
+
+    <section class="card">
+      <div class="card-head">
+        <h2 class="card-heading">保存しているクエスト</h2>
+        <button class="sort-link" id="shelf-sort">並び替え ▾</button>
+      </div>
+      <ul class="shelf-list" id="shelf-list"></ul>
+    </section>
+
+    <section class="card" id="shelf-recent-card">
+      <h2 class="card-heading">最近使った</h2>
+      <div class="chip-row" id="shelf-recent-row"></div>
+    </section>
+
+    <p class="hidden-note" id="shelf-hidden-hint">非表示にしたクエストは復元できます　<button class="link-btn" id="btn-manage-hidden">非表示を管理 ›</button></p>
+
+    <button class="cta-btn" id="btn-new-quest">＋ 新しいクエストを作成</button>
+  </section>
+
+  <!-- ===================== QUEST FORM ===================== -->
+  <section class="screen hidden" id="screen-form">
+    <header class="topbar topbar-simple">
+      <h1 class="page-title small" id="form-title">新しいクエスト</h1>
+    </header>
+
+    <form class="card form-card" id="quest-form">
+      <label class="field-block">
+        <span class="field-label">名前</span>
+        <input type="text" id="f-title" placeholder="例：支払い確認" maxlength="30" required>
+      </label>
+
+      <div class="field-block">
+        <span class="field-label">カテゴリ</span>
+        <div class="pill-select" id="f-category" data-name="category">
+          <button type="button" data-value="本命">本命</button>
+          <button type="button" data-value="守り">守り</button>
+          <button type="button" data-value="整え">整え</button>
+          <button type="button" data-value="お金">お金</button>
+          <button type="button" data-value="超軽">超軽</button>
+        </div>
+      </div>
+
+      <div class="field-block">
+        <span class="field-label">難易度</span>
+        <div class="pill-select" id="f-difficulty" data-name="difficulty">
+          <button type="button" data-value="低">低</button>
+          <button type="button" data-value="中">中</button>
+          <button type="button" data-value="高">高</button>
+        </div>
+      </div>
+
+      <div class="field-block">
+        <span class="field-label">時間</span>
+        <div class="pill-select" id="f-minutes" data-name="minutes">
+          <button type="button" data-value="1">1分</button>
+          <button type="button" data-value="2">2分</button>
+          <button type="button" data-value="3">3分</button>
+          <button type="button" data-value="5">5分</button>
+          <button type="button" data-value="10">10分</button>
+          <button type="button" data-value="20">20分</button>
+        </div>
+      </div>
+
+      <div class="field-block">
+        <span class="field-label">報酬</span>
+        <p class="reward-preview"><b id="f-reward-preview">+50</b>EXP（難易度で自動算出）</p>
+      </div>
+
+      <div class="field-block">
+        <span class="field-label">お金効果</span>
+        <div class="pill-select" id="f-moneyeffect" data-name="moneyEffect">
+          <button type="button" data-value="none">なし</button>
+          <button type="button" data-value="deposit">金庫に積む</button>
+          <button type="button" data-value="saved">守った額を記録</button>
+        </div>
+      </div>
+
+      <label class="field-block hidden" id="f-amount-wrap">
+        <span class="field-label">金額</span>
+        <input type="number" id="f-amount" placeholder="500" min="0" step="1">
+      </label>
+
+      <div class="field-block">
+        <span class="field-label">保存先</span>
+        <div class="pill-select" id="f-destination" data-name="destination">
+          <button type="button" data-value="today">今日に追加</button>
+          <button type="button" data-value="shelf">棚に保存</button>
+          <button type="button" data-value="hidden">非表示</button>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="cta-btn">保存</button>
+        <button type="button" class="ghost-btn" id="f-cancel">キャンセル</button>
+        <button type="button" class="danger-btn hidden" id="f-delete">削除</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ===================== QUEST COMPLETE ===================== -->
+  <section class="screen hidden" id="screen-complete">
+    <header class="topbar topbar-simple">
+      <h1 class="page-title small">クエスト達成</h1>
+    </header>
+
+    <section class="card complete-card">
+      <p class="complete-questname" id="c-questname">-</p>
+      <div class="complete-exp">+<span id="c-exp">0</span>EXP</div>
+      <div class="complete-map-line">
+        <span id="c-pref">-</span>
+        <span class="accent-mint"><span id="c-pct-before">0</span>% → <span id="c-pct-after">0</span>%</span>
+      </div>
+      <div class="complete-streak">連続記録 <b id="c-streak">0</b>日</div>
+    </section>
+
+    <section class="card hidden" id="c-money-card">
+      <h2 class="card-heading">追加リザルト</h2>
+      <p class="money-result-row hidden" id="c-deposit-row">金庫 <span class="accent-mint">+¥<span id="c-deposit-amount">0</span></span></p>
+      <p class="money-result-row hidden" id="c-saved-row">守った額 <span class="accent-mint">+¥<span id="c-saved-amount">0</span></span></p>
+    </section>
+
+    <section class="card">
+      <h2 class="card-heading">マップ進行</h2>
+      <p class="map-mini-sub">次のスポット：<span id="c-nextSpot">-</span></p>
+      <p class="map-mini-sub">岩手県まであと <span class="accent-gold" id="c-expToNext">0</span>EXP</p>
+      <svg viewBox="0 0 160 100" id="c-map-svg" class="complete-map-svg"></svg>
+    </section>
+
+    <section class="card hidden" id="c-spot-card">
+      <p class="spot-found-label" id="c-spot-label">- を発見</p>
+      <div class="souvenir-card">
+        <div class="souvenir-icon" id="c-souvenir-icon"></div>
+        <div>
+          <p class="souvenir-name" id="c-souvenir-name">-</p>
+          <p class="souvenir-rarity" id="c-souvenir-rarity">コモン</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="form-actions">
+      <button class="cta-btn" id="c-next-quest">次のクエストへ</button>
+      <button class="ghost-btn" id="c-view-map">マップを見る</button>
+    </div>
+  </section>
+
+  <!-- ===================== MAP ===================== -->
+  <section class="screen hidden" id="screen-map">
+    <header class="topbar topbar-simple">
+      <h1 class="page-title small">前進マップ</h1>
+      <span class="count-pill"><span class="icon-slot icon-inline" data-icon="compass"></span> 日本編</span>
+    </header>
+
+    <div class="row-cards">
+      <section class="card stat-mini-card">
+        <p class="stat-mini-label">EXP 累計</p>
+        <p class="stat-mini-value" id="map-totalExp">0</p>
+      </section>
+      <section class="card stat-mini-card">
+        <p class="stat-mini-label"><span class="icon-slot icon-inline" data-icon="map"></span> 累計距離</p>
+        <p class="stat-mini-value"><span id="map-distance">0</span>km</p>
+      </section>
+    </div>
+
+    <section class="card map-main-card">
+      <p>現在地：<span class="accent-mint" id="map-currentPref">-</span></p>
+      <p class="map-pct-big"><span id="map-prefPct">0</span>%</p>
+      <div class="bar-track"><div class="bar-fill" id="map-prefBar"></div></div>
+      <p class="map-mini-sub">次のスポット：<span id="map-nextSpot">-</span></p>
+      <p class="map-mini-sub">岩手県まであと <span class="accent-gold" id="map-expToNext">0</span>EXP</p>
+      <svg viewBox="0 0 220 280" id="map-main-svg" class="map-main-svg"></svg>
+      <div class="region-chip"><span class="icon-slot icon-inline" data-icon="mountain"></span> 東北 <span id="map-regionCompleted">0</span>/<span id="map-regionTotal">0</span>県</div>
+    </section>
+
+    <section class="card">
+      <h2 class="card-heading">旅の記録</h2>
+      <ul class="travel-log" id="map-log-list"></ul>
+    </section>
+
+    <section class="card">
+      <h2 class="card-heading">見つけた記念品</h2>
+      <div class="souvenir-grid" id="map-souvenir-grid"></div>
+    </section>
+  </section>
+
+  <!-- ===================== VAULT TOP ===================== -->
+  <section class="screen hidden" id="screen-vault">
+    <header class="topbar topbar-simple">
+      <h1 class="page-title small">金庫</h1>
+    </header>
+
+    <section class="card vault-top-card" id="vault-top-main">
+      <div class="vault-top-visual" id="vt-vault-visual"></div>
+      <p class="vault-top-title" id="vt-title">-</p>
+      <p class="vault-top-amount"><span id="vt-current">0</span> / <span id="vt-target">0</span></p>
+      <div class="bar-track"><div class="bar-fill" id="vt-bar"></div></div>
+      <p class="vault-mini-rest">あと ¥<span id="vt-rest">0</span></p>
+      <p class="vault-next-milestone"><span class="icon-slot icon-inline" data-icon="flag"></span> 次の節目まで ¥<span id="vt-nextMilestone">0</span></p>
+      <div class="milestone-row" id="vt-milestones"></div>
+      <span class="chevron-end">›</span>
+    </section>
+
+    <div class="row-cards">
+      <section class="card summary-mini-card">
+        <p class="summary-mini-icon icon-slot" data-icon="shield"></p>
+        <p class="summary-mini-label">今月守った額</p>
+        <p class="summary-mini-value">¥<span id="vt-savedMonth">0</span></p>
+        <p class="summary-mini-delta" id="vt-savedDelta">前月比 +0%</p>
+      </section>
+      <section class="card summary-mini-card">
+        <p class="summary-mini-icon icon-slot" data-icon="coin"></p>
+        <p class="summary-mini-label">今月積んだ額</p>
+        <p class="summary-mini-value">¥<span id="vt-depositedMonth">0</span></p>
+        <p class="summary-mini-delta" id="vt-depositedDelta">前月比 +0%</p>
+      </section>
+    </div>
+
+    <section class="card">
+      <div class="card-head">
+        <h2 class="card-heading">最近のお金クエスト</h2>
+        <button class="link-btn" id="vt-see-all">すべて見る ›</button>
+      </div>
+      <ul class="money-quest-list" id="vt-recent-list"></ul>
+    </section>
+
+    <div class="form-actions">
+      <button class="ghost-btn" id="vt-add-vault">＋ 金庫を追加</button>
+      <button class="ghost-btn" id="vt-view-records"><span class="icon-slot icon-inline" data-icon="record"></span> 記録を見る</button>
+    </div>
+  </section>
+
+  <!-- ===================== VAULT DETAIL ===================== -->
+  <section class="screen hidden" id="screen-vault-detail">
+    <header class="topbar topbar-simple">
+      <button class="icon-btn" id="vd-back">←</button>
+      <h1 class="page-title small" id="vd-title">-</h1>
+      <button class="icon-btn">⋯</button>
+    </header>
+
+    <section class="card vault-detail-top">
+      <div class="vault-detail-visual" id="vd-vault-visual"></div>
+      <div class="vault-detail-ring-row">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 120 120" class="ring-svg">
+            <circle cx="60" cy="60" r="52" class="ring-bg"/>
+            <circle cx="60" cy="60" r="52" class="ring-fg" id="vd-ring"/>
+          </svg>
+          <span class="ring-pct" id="vd-pct">0%</span>
+        </div>
+        <div class="vault-detail-amounts">
+          <p class="vault-detail-main"><span id="vd-current">0</span> / <span id="vd-target">0</span></p>
+          <p class="vault-mini-rest">あと ¥<span id="vd-rest">0</span></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card-heading">次の節目</h2>
+      <div class="step-track" id="vd-steps"></div>
+      <p class="map-mini-sub" id="vd-nextStepLabel">-</p>
+    </section>
+
+    <section class="card">
+      <h2 class="card-heading">今月の内訳</h2>
+      <div class="breakdown-row">
+        <div class="breakdown-cell">
+          <p class="breakdown-label">積んだ額</p>
+          <p class="breakdown-value accent-gold">¥<span id="vd-deposited">0</span></p>
+        </div>
+        <div class="breakdown-cell">
+          <p class="breakdown-label">守った額</p>
+          <p class="breakdown-value accent-mint">¥<span id="vd-saved">0</span></p>
+        </div>
+        <div class="breakdown-cell">
+          <p class="breakdown-label">金庫クエスト</p>
+          <p class="breakdown-value" id="vd-questCount">0件</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card-heading">この金庫に効いたクエスト</h2>
+      <ul class="money-quest-list" id="vd-quest-list"></ul>
+    </section>
+
+    <section class="card">
+      <h2 class="card-heading">手に入ること</h2>
+      <ul class="benefit-list" id="vd-benefits"></ul>
+    </section>
+
+    <div class="form-actions vault-detail-actions">
+      <button class="cta-btn" id="vd-deposit-btn"><span class="icon-slot icon-inline" data-icon="coin"></span> 金庫に積む</button>
+      <button class="mint-btn" id="vd-saved-btn"><span class="icon-slot icon-inline" data-icon="shield"></span> 守った額を記録</button>
+      <button class="ghost-btn" id="vd-edit-btn"><span class="icon-slot icon-inline" data-icon="edit"></span> 金庫を編集</button>
+    </div>
+  </section>
+
+  <!-- ===================== VAULT EDIT ===================== -->
+  <section class="screen hidden" id="screen-vault-edit">
+    <header class="topbar topbar-simple">
+      <h1 class="page-title small">金庫を編集</h1>
+    </header>
+
+    <form class="card form-card" id="vault-edit-form">
+      <label class="field-block">
+        <span class="field-label">金庫名</span>
+        <input type="text" id="ve-title" placeholder="例：外付けSSDの金庫" maxlength="30" required>
+      </label>
+
+      <label class="field-block">
+        <span class="field-label">目標額</span>
+        <input type="number" id="ve-target" placeholder="80000" min="1" step="1" required>
+      </label>
+
+      <label class="field-block">
+        <span class="field-label">現在額</span>
+        <input type="number" id="ve-current" placeholder="12000" min="0" step="1" required>
+      </label>
+
+      <div class="field-block">
+        <span class="field-label">節目（金額のみ編集できます）</span>
+        <div class="milestone-edit-list" id="ve-milestones"></div>
+        <p class="form-error hidden" id="ve-milestone-error">節目金額は0以上、目標額以下にしてください</p>
+      </div>
+
+      <div class="field-block">
+        <span class="field-label">手に入ること</span>
+        <input type="text" id="ve-benefit-0" maxlength="40" placeholder="例：制作データを逃がせる">
+        <input type="text" id="ve-benefit-1" maxlength="40" placeholder="例：容量不安が減る">
+        <input type="text" id="ve-benefit-2" maxlength="40" placeholder="例：制作環境が軽くなる">
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="cta-btn">保存</button>
+        <button type="button" class="ghost-btn" id="ve-cancel">キャンセル</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ===================== RECORDS ===================== -->
+  <section class="screen hidden" id="screen-records">
+    <header class="topbar topbar-simple">
+      <h1 class="page-title small">記録</h1>
+      <button class="icon-btn" id="btn-open-settings" aria-label="設定">
+        <span class="icon-slot" data-icon="settings"></span>
+      </button>
+    </header>
+
+    <section class="card">
+      <h2 class="card-heading">今週の記録</h2>
+      <div class="record-stat-grid">
+        <div class="record-stat-cell">
+          <p class="record-stat-label">獲得EXP</p>
+          <p class="record-stat-value accent-gold"><span id="rec-exp">0</span>EXP</p>
+        </div>
+        <div class="record-stat-cell">
+          <p class="record-stat-label">完了クエスト数</p>
+          <p class="record-stat-value"><span id="rec-questCount">0</span>件</p>
+        </div>
+        <div class="record-stat-cell">
+          <p class="record-stat-label">守った額</p>
+          <p class="record-stat-value accent-mint">¥<span id="rec-saved">0</span></p>
+        </div>
+        <div class="record-stat-cell">
+          <p class="record-stat-label">金庫に積んだ額</p>
+          <p class="record-stat-value accent-gold">¥<span id="rec-deposited">0</span></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card-heading">最近の達成</h2>
+      <ul class="history-list" id="rec-history-list"></ul>
+    </section>
+
+    <section class="card streak-card">
+      <div class="streak-head">
+        <div>
+          <span class="card-heading">連続記録</span>
+          <div class="streak-days"><span id="rec-streakDays">0</span>日</div>
+        </div>
+        <div class="streak-week">今週 <span id="rec-weekCount">0/0</span></div>
+      </div>
+      <div class="lantern-row" id="rec-lantern-row"></div>
+    </section>
+  </section>
+
+  <!-- ===================== SETTINGS ===================== -->
+  <section class="screen hidden" id="screen-settings">
+    <header class="topbar topbar-simple">
+      <button class="icon-btn" id="settings-back">←</button>
+      <h1 class="page-title small">設定</h1>
+    </header>
+
+    <section class="card">
+      <h2 class="card-heading">データを書き出す</h2>
+      <textarea class="data-textarea" id="settings-export-area" rows="6" readonly></textarea>
+      <div class="form-actions">
+        <button type="button" class="ghost-btn" id="settings-copy-btn">コピー</button>
+      </div>
+      <p class="form-note hidden" id="settings-copy-note">コピーしました</p>
+    </section>
+
+    <section class="card">
+      <h2 class="card-heading">データを読み込む</h2>
+      <textarea class="data-textarea" id="settings-import-area" rows="6" placeholder="書き出したJSONを貼り付け"></textarea>
+      <p class="form-error hidden" id="settings-import-error"></p>
+      <div class="form-actions">
+        <button type="button" class="cta-btn" id="settings-import-btn">読み込む</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card-heading">データを管理</h2>
+      <div class="form-actions">
+        <button type="button" class="ghost-btn" id="settings-demo-btn">デモデータに戻す</button>
+        <button type="button" class="danger-btn" id="settings-wipe-btn">全データを削除する</button>
+      </div>
+    </section>
+
+    <p class="settings-hint">iPhoneでは共有ボタンから「ホーム画面に追加」できます</p>
+  </section>
+
+  <!-- ===================== BOTTOM NAV ===================== -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-screen="home">
+      <span class="icon-slot nav-icon" data-icon="home"></span>
+      <span>ホーム</span>
+    </button>
+    <button class="nav-btn" data-screen="shelf">
+      <span class="icon-slot nav-icon" data-icon="quest"></span>
+      <span>クエスト</span>
+    </button>
+    <button class="nav-btn" data-screen="map">
+      <span class="icon-slot nav-icon" data-icon="map"></span>
+      <span>マップ</span>
+    </button>
+    <button class="nav-btn" data-screen="vault">
+      <span class="icon-slot nav-icon" data-icon="vault"></span>
+      <span>金庫</span>
+    </button>
+    <button class="nav-btn" data-screen="records">
+      <span class="icon-slot nav-icon" data-icon="record"></span>
+      <span>記録</span>
+    </button>
+  </nav>
+
+  <!-- ===================== RECORD MODAL ===================== -->
+  <div class="modal-overlay hidden" id="record-modal-overlay">
+    <form class="modal-card form-card" id="record-modal-form">
+      <h2 class="page-title small" id="record-modal-title">金庫に積む</h2>
+
+      <label class="field-block hidden" id="record-modal-content-field">
+        <span class="field-label">内容</span>
+        <input type="text" id="record-modal-content" maxlength="40" placeholder="例：コンビニを見送る">
+      </label>
+
+      <label class="field-block">
+        <span class="field-label">金額</span>
+        <input type="number" id="record-modal-amount" min="1" step="1" placeholder="500" inputmode="numeric">
+      </label>
+
+      <label class="field-block">
+        <span class="field-label">メモ（任意）</span>
+        <input type="text" id="record-modal-memo" maxlength="60" placeholder="メモ">
+      </label>
+
+      <p class="field-block record-modal-target hidden" id="record-modal-target-field">反映先：<b id="record-modal-target-name">-</b></p>
+
+      <p class="reward-preview">付与EXP <b>+50</b>EXP</p>
+      <p class="form-error hidden" id="record-modal-error">金額は1以上の数値で入力してください</p>
+
+      <div class="form-actions">
+        <button type="submit" class="cta-btn">保存</button>
+        <button type="button" class="ghost-btn" id="record-modal-cancel">キャンセル</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="toast hidden" id="toast"></div>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>
