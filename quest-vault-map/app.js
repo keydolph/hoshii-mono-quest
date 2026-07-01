@@ -3,6 +3,9 @@
 
   var STORAGE_KEY = "questVaultMapAppState";
 
+  var PCT_MILESTONES = [25, 50, 75, 100];
+  var PCT_MILESTONE_MSGS = { 25: "金庫に灯りがひとつ増えた", 50: "半分まで来た", 75: "もう少しで届く", 100: "金庫が開けられます" };
+
   var ICONS = {
     main: '<path d="M9 18V6.5l10-2V16"/><circle cx="7" cy="18" r="2.3"/><circle cx="17" cy="16" r="2.3"/>',
     shield: '<path d="M12 3l7 3v5.5c0 5-3 8.2-7 9.5-4-1.3-7-4.5-7-9.5V6l7-3z"/>',
@@ -45,16 +48,17 @@
 
   function vaultVisualHtml(pct) {
     pct = Math.max(0, Math.min(100, pct || 0));
-    var litCount = Math.round(pct / 20);
+    var litCount = pct >= 100 ? 4 : pct >= 75 ? 3 : pct >= 50 ? 2 : pct >= 25 ? 1 : 0;
     var fillH = 58 * (pct / 100);
     var fillY = 21 + (58 - fillH);
+    var glowClass = pct >= 100 ? " vault-full" : "";
     var lights = "";
-    for (var i = 0; i < 5; i++) {
-      var ly = 23 + i * 11;
-      lights += '<rect x="10.5" y="' + ly + '" width="5" height="6" rx="1.4" class="vault-led' + (i < litCount ? " lit" : "") + '"/>';
+    for (var i = 0; i < 4; i++) {
+      var ly = 26 + i * 13;
+      lights += '<rect x="10.5" y="' + ly + '" width="5" height="8" rx="1.4" class="vault-led' + (i < litCount ? " lit" : "") + '"/>';
     }
     return (
-      '<svg class="vault-visual" viewBox="0 0 100 100">' +
+      '<svg class="vault-visual' + glowClass + '" viewBox="0 0 100 100">' +
       '<defs>' +
       '<linearGradient id="vaultMetal" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3c4868"/><stop offset="100%" stop-color="#101724"/></linearGradient>' +
       '<linearGradient id="vaultDoor" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#28324c"/><stop offset="100%" stop-color="#131a2a"/></linearGradient>' +
@@ -124,24 +128,24 @@
         lastCompletedDate: ""
       },
       quests: [
-        { id: uid("fs"), title: "8小節だけ作る", category: "本命", difficulty: "中", minutes: 20, exp: 150, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 5, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: uid("fs"), title: "10分だけ作業する", category: "本命", difficulty: "低", minutes: 10, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 4, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: uid("fs"), title: "1フレーズだけ書く", category: "本命", difficulty: "低", minutes: 5, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 4, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: uid("fs"), title: "支払い確認", category: "守り", difficulty: "中", minutes: 3, exp: 150, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 4, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: uid("fs"), title: "明日の予定を見る", category: "守り", difficulty: "低", minutes: 2, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: uid("fs"), title: "連絡を1つ返す", category: "守り", difficulty: "低", minutes: 3, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 3, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: uid("fs"), title: "机の上を3分整える", category: "整え", difficulty: "低", minutes: 3, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: uid("fs"), title: "洗濯を回す", category: "整え", difficulty: "低", minutes: 2, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: uid("fs"), title: "水を飲む", category: "整え", difficulty: "低", minutes: 1, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 1, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: uid("fs"), title: "10分だけ散歩する", category: "整え", difficulty: "低", minutes: 10, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 3, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: uid("fs"), title: "500円を金庫に移す", category: "お金", difficulty: "低", minutes: 2, exp: 50, moneyEffect: "deposit", amount: 500, usageCount: 0, hidden: false, inToday: false, order: 0, vaultId: "v1", predictedDifficulty: 3, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: uid("fs"), title: "コンビニを見送る", category: "お金", difficulty: "低", minutes: 1, exp: 50, moneyEffect: "saved", amount: 380, usageCount: 0, hidden: false, inToday: false, order: 0, vaultId: "v1", predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: uid("fs"), title: "買う前に1日置く", category: "お金", difficulty: "中", minutes: 1, exp: 150, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 3, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: uid("fs"), title: "サブスクを1つ確認する", category: "お金", difficulty: "低", minutes: 5, exp: 50, moneyEffect: "saved", amount: 450, usageCount: 0, hidden: false, inToday: false, order: 0, vaultId: "v1", predictedDifficulty: 3, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: uid("fs"), title: "アプリを開くだけ", category: "超軽", difficulty: "低", minutes: 1, exp: 30, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 1, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: uid("fs"), title: "メモを1行だけ書く", category: "超軽", difficulty: "低", minutes: 1, exp: 30, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 1, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: uid("fs"), title: "1分だけ片付ける", category: "超軽", difficulty: "低", minutes: 1, exp: 30, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: uid("fs"), title: "深呼吸する", category: "超軽", difficulty: "低", minutes: 1, exp: 30, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 1, difficultyHistory: [], createdAt: now, updatedAt: now }
+        { id: uid("fs"), title: "8小節だけ作る", category: "本命", categories: ["本命"], difficulty: "中", minutes: 20, exp: 150, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 5, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "10分だけ作業する", category: "本命", categories: ["本命"], difficulty: "低", minutes: 10, exp: 100, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 4, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "1フレーズだけ書く", category: "本命", categories: ["本命"], difficulty: "低", minutes: 5, exp: 100, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 4, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "支払い確認", category: "守り", categories: ["守り"], difficulty: "中", minutes: 3, exp: 100, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 4, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "明日の予定を見る", category: "守り", categories: ["守り"], difficulty: "低", minutes: 2, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "連絡を1つ返す", category: "守り", categories: ["守り"], difficulty: "低", minutes: 3, exp: 100, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 3, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "机の上を3分整える", category: "整え", categories: ["整え"], difficulty: "低", minutes: 3, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "洗濯を回す", category: "整え", categories: ["整え"], difficulty: "低", minutes: 2, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "水を飲む", category: "整え", categories: ["整え"], difficulty: "低", minutes: 1, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 1, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "10分だけ散歩する", category: "整え", categories: ["整え"], difficulty: "低", minutes: 10, exp: 100, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 3, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "500円を金庫に移す", category: "お金", categories: ["お金", "守り"], difficulty: "低", minutes: 2, exp: 100, moneyEffect: "deposit", amount: 500, usageCount: 0, hidden: false, inToday: false, order: 0, vaultId: "v1", predictedDifficulty: 3, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "コンビニを見送る", category: "お金", categories: ["お金", "守り"], difficulty: "低", minutes: 1, exp: 50, moneyEffect: "saved", amount: 380, usageCount: 0, hidden: false, inToday: false, order: 0, vaultId: "v1", predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "買う前に1日置く", category: "お金", categories: ["お金"], difficulty: "中", minutes: 1, exp: 100, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 3, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "サブスクを1つ確認する", category: "お金", categories: ["お金", "守り"], difficulty: "低", minutes: 5, exp: 100, moneyEffect: "saved", amount: 450, usageCount: 0, hidden: false, inToday: false, order: 0, vaultId: "v1", predictedDifficulty: 3, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "アプリを開くだけ", category: "超軽", categories: ["超軽"], difficulty: "低", minutes: 1, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 1, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "メモを1行だけ書く", category: "超軽", categories: ["超軽"], difficulty: "低", minutes: 1, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 1, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "1分だけ片付ける", category: "超軽", categories: ["超軽", "整え"], difficulty: "低", minutes: 1, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: uid("fs"), title: "深呼吸する", category: "超軽", categories: ["超軽", "整え"], difficulty: "低", minutes: 1, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 1, difficultyHistory: [], createdAt: now, updatedAt: now }
       ],
       vaults: [
         {
@@ -153,14 +157,7 @@
           depositedThisMonth: 0,
           savedDeltaPct: 0,
           depositedDeltaPct: 0,
-          milestoneStepIndex: 0,
-          milestones: [
-            { label: "作成", amount: 0 },
-            { label: "下見", amount: 20000 },
-            { label: "候補決定", amount: 40000 },
-            { label: "購入準備", amount: 60000 },
-            { label: "購入可能", amount: 80000 }
-          ],
+          reachedMilestones: [],
           benefits: ["制作データを逃がせる", "容量不安が減る", "制作環境が軽くなる"]
         }
       ],
@@ -197,35 +194,35 @@
         lastCompletedDate: ""
       },
       quests: [
-        { id: "q1", title: "支払い確認", category: "守り", difficulty: "中", minutes: 3, exp: 150, moneyEffect: "none", amount: 0, usageCount: 1, hidden: false, inToday: true, order: 1, predictedDifficulty: 4, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: "q2", title: "机の上を3分整える", category: "整え", difficulty: "低", minutes: 3, exp: 50, moneyEffect: "none", amount: 0, usageCount: 1, hidden: false, inToday: true, order: 2, predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: "q3", title: "8小節だけ作る", category: "本命", difficulty: "中", minutes: 20, exp: 150, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: true, order: 3, predictedDifficulty: 5, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: "q4", title: "500円を金庫に移す", category: "お金", difficulty: "低", minutes: 2, exp: 50, moneyEffect: "deposit", amount: 500, usageCount: 1, hidden: false, inToday: true, order: 4, vaultId: "v1", predictedDifficulty: 3, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: "q5", title: "コンビニを見送る", category: "お金", difficulty: "低", minutes: 1, exp: 50, moneyEffect: "saved", amount: 380, usageCount: 1, hidden: false, inToday: true, order: 5, vaultId: "v1", predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q1", title: "支払い確認", category: "守り", categories: ["守り"], difficulty: "中", minutes: 3, exp: 100, moneyEffect: "none", amount: 0, usageCount: 1, hidden: false, inToday: true, order: 1, predictedDifficulty: 4, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q2", title: "机の上を3分整える", category: "整え", categories: ["整え"], difficulty: "低", minutes: 3, exp: 50, moneyEffect: "none", amount: 0, usageCount: 1, hidden: false, inToday: true, order: 2, predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q3", title: "8小節だけ作る", category: "本命", categories: ["本命"], difficulty: "中", minutes: 20, exp: 150, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: true, order: 3, predictedDifficulty: 5, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q4", title: "500円を金庫に移す", category: "お金", categories: ["お金", "守り"], difficulty: "低", minutes: 2, exp: 100, moneyEffect: "deposit", amount: 500, usageCount: 1, hidden: false, inToday: true, order: 4, vaultId: "v1", predictedDifficulty: 3, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q5", title: "コンビニを見送る", category: "お金", categories: ["お金", "守り"], difficulty: "低", minutes: 1, exp: 50, moneyEffect: "saved", amount: 380, usageCount: 1, hidden: false, inToday: true, order: 5, vaultId: "v1", predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
 
-        { id: "q6", title: "サビの仮メロを置く", category: "本命", difficulty: "高", minutes: 20, exp: 300, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 7, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: "q7", title: "10分だけ作業する", category: "本命", difficulty: "低", minutes: 10, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 4, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: "q8", title: "1フレーズだけ書く", category: "本命", difficulty: "低", minutes: 5, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 4, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: "q9", title: "音源を1つだけ整理する", category: "本命", difficulty: "低", minutes: 10, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 3, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q6", title: "サビの仮メロを置く", category: "本命", categories: ["本命"], difficulty: "高", minutes: 20, exp: 220, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 7, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q7", title: "10分だけ作業する", category: "本命", categories: ["本命"], difficulty: "低", minutes: 10, exp: 100, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 4, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q8", title: "1フレーズだけ書く", category: "本命", categories: ["本命"], difficulty: "低", minutes: 5, exp: 100, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 4, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q9", title: "音源を1つだけ整理する", category: "本命", categories: ["本命", "整え"], difficulty: "低", minutes: 10, exp: 100, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 3, difficultyHistory: [], createdAt: now, updatedAt: now },
 
-        { id: "q10", title: "サブスク確認", category: "守り", difficulty: "中", minutes: 5, exp: 150, moneyEffect: "saved", amount: 980, usageCount: 1, hidden: false, inToday: false, order: 0, vaultId: "v1", predictedDifficulty: 4, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: "q11", title: "明日の予定を見る", category: "守り", difficulty: "低", minutes: 2, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: "q12", title: "連絡を1つ返す", category: "守り", difficulty: "低", minutes: 3, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 3, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q10", title: "サブスク確認", category: "守り", categories: ["守り", "お金"], difficulty: "中", minutes: 5, exp: 100, moneyEffect: "saved", amount: 980, usageCount: 1, hidden: false, inToday: false, order: 0, vaultId: "v1", predictedDifficulty: 4, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q11", title: "明日の予定を見る", category: "守り", categories: ["守り"], difficulty: "低", minutes: 2, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q12", title: "連絡を1つ返す", category: "守り", categories: ["守り"], difficulty: "低", minutes: 3, exp: 100, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 3, difficultyHistory: [], createdAt: now, updatedAt: now },
 
-        { id: "q13", title: "洗濯を回す", category: "整え", difficulty: "低", minutes: 2, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: "q14", title: "ゴミをまとめる", category: "整え", difficulty: "低", minutes: 2, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: "q15", title: "水を飲む", category: "整え", difficulty: "低", minutes: 1, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 1, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: "q16", title: "10分だけ散歩する", category: "整え", difficulty: "低", minutes: 10, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 3, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q13", title: "洗濯を回す", category: "整え", categories: ["整え"], difficulty: "低", minutes: 2, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q14", title: "ゴミをまとめる", category: "整え", categories: ["整え"], difficulty: "低", minutes: 2, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q15", title: "水を飲む", category: "整え", categories: ["整え"], difficulty: "低", minutes: 1, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 1, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q16", title: "10分だけ散歩する", category: "整え", categories: ["整え"], difficulty: "低", minutes: 10, exp: 100, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 3, difficultyHistory: [], createdAt: now, updatedAt: now },
 
-        { id: "q17", title: "外食を見送る", category: "お金", difficulty: "低", minutes: 1, exp: 50, moneyEffect: "saved", amount: 600, usageCount: 0, hidden: false, inToday: false, order: 0, vaultId: "v1", predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: "q18", title: "買う前に1日置く", category: "お金", difficulty: "中", minutes: 1, exp: 150, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 3, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: "q19", title: "サブスクを1つ確認する", category: "お金", difficulty: "低", minutes: 5, exp: 50, moneyEffect: "saved", amount: 450, usageCount: 0, hidden: false, inToday: false, order: 0, vaultId: "v1", predictedDifficulty: 3, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q17", title: "外食を見送る", category: "お金", categories: ["お金", "守り"], difficulty: "低", minutes: 1, exp: 50, moneyEffect: "saved", amount: 600, usageCount: 0, hidden: false, inToday: false, order: 0, vaultId: "v1", predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q18", title: "買う前に1日置く", category: "お金", categories: ["お金"], difficulty: "中", minutes: 1, exp: 100, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 3, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q19", title: "サブスクを1つ確認する", category: "お金", categories: ["お金", "守り"], difficulty: "低", minutes: 5, exp: 100, moneyEffect: "saved", amount: 450, usageCount: 0, hidden: false, inToday: false, order: 0, vaultId: "v1", predictedDifficulty: 3, difficultyHistory: [], createdAt: now, updatedAt: now },
 
-        { id: "q20", title: "財布を見るだけ", category: "超軽", difficulty: "低", minutes: 2, exp: 30, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 1, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: "q21", title: "アプリを開くだけ", category: "超軽", difficulty: "低", minutes: 1, exp: 30, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 1, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: "q22", title: "メモを1行だけ書く", category: "超軽", difficulty: "低", minutes: 1, exp: 30, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 1, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: "q23", title: "1分だけ片付ける", category: "超軽", difficulty: "低", minutes: 1, exp: 30, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
-        { id: "q24", title: "深呼吸する", category: "超軽", difficulty: "低", minutes: 1, exp: 30, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 1, difficultyHistory: [], createdAt: now, updatedAt: now }
+        { id: "q20", title: "財布を見るだけ", category: "超軽", categories: ["超軽"], difficulty: "低", minutes: 2, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 1, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q21", title: "アプリを開くだけ", category: "超軽", categories: ["超軽"], difficulty: "低", minutes: 1, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 1, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q22", title: "メモを1行だけ書く", category: "超軽", categories: ["超軽"], difficulty: "低", minutes: 1, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 1, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q23", title: "1分だけ片付ける", category: "超軽", categories: ["超軽", "整え"], difficulty: "低", minutes: 1, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 2, difficultyHistory: [], createdAt: now, updatedAt: now },
+        { id: "q24", title: "深呼吸する", category: "超軽", categories: ["超軽", "整え"], difficulty: "低", minutes: 1, exp: 50, moneyEffect: "none", amount: 0, usageCount: 0, hidden: false, inToday: false, order: 0, predictedDifficulty: 1, difficultyHistory: [], createdAt: now, updatedAt: now }
       ],
       vaults: [
         {
@@ -237,14 +234,7 @@
           depositedThisMonth: 500,
           savedDeltaPct: 0,
           depositedDeltaPct: 0,
-          milestoneStepIndex: 1,
-          milestones: [
-            { label: "作成", amount: 0 },
-            { label: "下見", amount: 20000 },
-            { label: "候補決定", amount: 40000 },
-            { label: "購入準備", amount: 60000 },
-            { label: "購入可能", amount: 80000 }
-          ],
+          reachedMilestones: [],
           benefits: ["制作データを逃がせる", "容量不安が減る", "制作環境が軽くなる"]
         }
       ],
@@ -354,10 +344,18 @@
     state.quests.forEach(function (q) {
       if (!q.id) q.id = uid("q");
       if (typeof q.title !== "string") q.title = "無題のクエスト";
-      if (typeof q.category !== "string") q.category = "本命";
       if (typeof q.difficulty !== "string") q.difficulty = "低";
+      var _diffMap = { "低": 2, "中": 5, "高": 8 };
+      if (typeof q.predictedDifficulty !== "number" || q.predictedDifficulty < 1 || q.predictedDifficulty > 10) {
+        q.predictedDifficulty = _diffMap[q.difficulty] || 5;
+      }
+      if (!Array.isArray(q.categories) || q.categories.length === 0) {
+        q.categories = q.category ? [q.category] : ["本命"];
+      }
+      q.category = q.categories[0];
+      if (typeof q.difficulty !== "string") q.difficulty = q.predictedDifficulty <= 4 ? "低" : q.predictedDifficulty <= 6 ? "中" : "高";
       q.minutes = numberOr(q.minutes, 3);
-      q.exp = numberOr(q.exp, calculateExp(q.difficulty, q.category));
+      q.exp = numberOr(q.exp, calculateExp(q.predictedDifficulty));
       if (["none", "deposit", "saved"].indexOf(q.moneyEffect) === -1) q.moneyEffect = "none";
       q.amount = q.moneyEffect === "none" ? 0 : numberOr(q.amount, 0);
       q.usageCount = numberOr(q.usageCount, 0);
@@ -367,7 +365,6 @@
       if (typeof q.order !== "number" && q.order !== undefined) q.order = numberOr(q.order, 0);
       if (typeof q.createdAt !== "string") q.createdAt = nowIso();
       if (typeof q.updatedAt !== "string") q.updatedAt = q.createdAt;
-      if (typeof q.predictedDifficulty !== "number" || q.predictedDifficulty < 1 || q.predictedDifficulty > 10) q.predictedDifficulty = 5;
       if (!Array.isArray(q.difficultyHistory)) q.difficultyHistory = [];
     });
     var totals = historyTotals();
@@ -389,7 +386,7 @@
       if (typeof v.depositedThisMonth !== "number") v.depositedThisMonth = totals.deposited;
       if (typeof v.savedDeltaPct !== "number") v.savedDeltaPct = 0;
       if (typeof v.depositedDeltaPct !== "number") v.depositedDeltaPct = 0;
-      if (!Array.isArray(v.milestones)) v.milestones = cloneDefault(defaults.vaults[0].milestones);
+      if (!Array.isArray(v.reachedMilestones)) v.reachedMilestones = [];
       if (!Array.isArray(v.benefits)) v.benefits = [];
     });
     migrateQuestOrder();
@@ -435,12 +432,17 @@
     renderHome();
   }
 
-  function calculateExp(difficulty, category) {
-    if (category === "超軽") return 30;
-    if (difficulty === "低") return 50;
-    if (difficulty === "中") return 150;
-    if (difficulty === "高") return 300;
-    return 50;
+  function calculateExp(pd) {
+    pd = pd || 5;
+    if (pd <= 2) return 50;
+    if (pd <= 4) return 100;
+    if (pd <= 6) return 150;
+    if (pd <= 8) return 220;
+    return 300;
+  }
+
+  function primaryCategory(q) {
+    return (Array.isArray(q.categories) && q.categories.length > 0 ? q.categories[0] : null) || q.category || "本命";
   }
 
   function getVault(id) {
@@ -556,11 +558,10 @@
   }
 
   function questTagsHtml(q) {
-    return (
-      '<span class="tag-pill">' + q.category + '</span>' +
-      '<span class="tag-diff diff-' + q.difficulty + '">' + q.difficulty + '</span>' +
-      '<span class="tag-time">' + iconHtml("clock", "tag-clock") + q.minutes + '分</span>'
-    );
+    var cats = (Array.isArray(q.categories) && q.categories.length > 0) ? q.categories : [q.category || "本命"];
+    var catHtml = cats.slice(0, 2).map(function (c) { return '<span class="tag-pill">' + c + '</span>'; }).join('');
+    if (cats.length > 2) catHtml += '<span class="tag-pill tag-pill-more">+' + (cats.length - 2) + '</span>';
+    return catHtml + (q.minutes ? '<span class="tag-time">' + iconHtml("clock", "tag-clock") + q.minutes + '分</span>' : '');
   }
 
   function moneyHintHtml(q) {
@@ -652,7 +653,7 @@
         '<div class="quest-item">' +
         '<button class="quest-item-main" data-quest-id="' + q.id + '">' +
         '<span class="quest-icon-wrap">' +
-        '<span class="quest-icon cat-' + q.category + '">' + iconHtml(CATEGORY_ICON[q.category]) + '</span>' +
+        '<span class="quest-icon cat-' + primaryCategory(q) + '">' + iconHtml(CATEGORY_ICON[primaryCategory(q)]) + '</span>' +
         '<span class="quest-rank">' + (idx + 1) + '</span>' +
         '</span>' +
         '<span class="quest-body">' +
@@ -726,9 +727,16 @@
   /* ===================== SHELF ===================== */
 
   var shelfTab = "favorite";
+  var shelfCatFilter = "";
 
   function renderShelf() {
     var visible = state.quests.filter(function (q) { return !q.hidden; });
+    if (shelfCatFilter) {
+      visible = visible.filter(function (q) {
+        var cats = (Array.isArray(q.categories) && q.categories.length > 0) ? q.categories : [q.category || "本命"];
+        return cats.indexOf(shelfCatFilter) !== -1;
+      });
+    }
     document.getElementById("shelf-count").textContent = state.quests.length;
     document.getElementById("shelf-hidden-hint").classList.toggle("hidden", shelfTab === "hidden");
 
@@ -760,7 +768,7 @@
 
       li.innerHTML =
         '<div class="shelf-item-top">' +
-        '<span class="quest-icon cat-' + q.category + '">' + iconHtml(CATEGORY_ICON[q.category]) + '</span>' +
+        '<span class="quest-icon cat-' + primaryCategory(q) + '">' + iconHtml(CATEGORY_ICON[primaryCategory(q)]) + '</span>' +
         '<div class="shelf-item-meta">' +
         '<p class="shelf-item-name">' + q.title + '</p>' +
         '<div class="shelf-item-tags">' + questTagsHtml(q) + '<span class="usage-count">使用' + q.usageCount + '回</span></div>' +
@@ -795,7 +803,7 @@
     recent.forEach(function (q) {
       var chip = document.createElement("span");
       chip.className = "recent-chip";
-      chip.innerHTML = iconHtml(CATEGORY_ICON[q.category], "chip-icon") + " " + q.title + ' <button data-id="' + q.id + '">＋</button>';
+      chip.innerHTML = iconHtml(CATEGORY_ICON[primaryCategory(q)], "chip-icon") + " " + q.title + ' <button data-id="' + q.id + '">＋</button>';
       recentRow.appendChild(chip);
     });
     recentRow.querySelectorAll("button[data-id]").forEach(function (btn) {
@@ -810,6 +818,16 @@
     btn.addEventListener("click", function () {
       shelfTab = btn.getAttribute("data-shelf-tab");
       document.querySelectorAll("[data-shelf-tab]").forEach(function (b) { b.classList.toggle("active", b === btn); });
+      renderShelf();
+    });
+  });
+
+  document.querySelectorAll("[data-cat-filter]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      shelfCatFilter = btn.getAttribute("data-cat-filter");
+      document.querySelectorAll("[data-cat-filter]").forEach(function (b) {
+        b.classList.toggle("active", b.getAttribute("data-cat-filter") === shelfCatFilter);
+      });
       renderShelf();
     });
   });
@@ -835,7 +853,7 @@
   /* ===================== QUEST FORM ===================== */
 
   var editingQuestId = null;
-  var formValues = { category: "本命", difficulty: "低", minutes: "3", moneyEffect: "none", destination: "today", predictedDifficulty: "5" };
+  var formValues = { categories: ["本命"], minutes: "3", moneyEffect: "none", destination: "today", predictedDifficulty: "5" };
 
   function setPillSelected(groupId, value) {
     var group = document.getElementById(groupId);
@@ -844,13 +862,35 @@
     });
   }
 
+  function setMultiPillSelected(groupId, values) {
+    var group = document.getElementById(groupId);
+    group.querySelectorAll("button").forEach(function (b) {
+      b.classList.toggle("selected", values.indexOf(b.getAttribute("data-value")) !== -1);
+    });
+  }
+
   function updateRewardPreview() {
-    var exp = calculateExp(formValues.difficulty, formValues.category);
+    var pd = parseInt(formValues.predictedDifficulty, 10) || 5;
+    var exp = calculateExp(pd);
     document.getElementById("f-reward-preview").textContent = "+" + exp;
     return exp;
   }
 
-  ["f-category", "f-difficulty", "f-minutes", "f-moneyeffect", "f-destination", "f-pred-difficulty"].forEach(function (groupId) {
+  document.getElementById("f-category").querySelectorAll("button").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var val = btn.getAttribute("data-value");
+      var idx = formValues.categories.indexOf(val);
+      if (idx === -1) {
+        formValues.categories.push(val);
+      } else if (formValues.categories.length > 1) {
+        formValues.categories.splice(idx, 1);
+      }
+      setMultiPillSelected("f-category", formValues.categories);
+      updateRewardPreview();
+    });
+  });
+
+  ["f-minutes", "f-moneyeffect", "f-destination", "f-pred-difficulty"].forEach(function (groupId) {
     document.getElementById(groupId).querySelectorAll("button").forEach(function (btn) {
       btn.addEventListener("click", function () {
         var name = document.getElementById(groupId).getAttribute("data-name");
@@ -867,17 +907,16 @@
     document.getElementById("form-title").textContent = quest ? "クエストを編集" : "新しいクエスト";
     document.getElementById("f-delete").classList.toggle("hidden", !quest);
     document.getElementById("f-title").value = quest ? quest.title : "";
+    var questCats = quest ? (Array.isArray(quest.categories) && quest.categories.length > 0 ? quest.categories.slice() : [quest.category || "本命"]) : ["本命"];
     formValues = {
-      category: quest ? quest.category : "本命",
-      difficulty: quest ? quest.difficulty : "低",
+      categories: questCats,
       minutes: quest ? String(quest.minutes) : "3",
       moneyEffect: quest ? quest.moneyEffect : "none",
       destination: quest ? (quest.inToday ? "today" : quest.hidden ? "hidden" : "shelf") : "today",
       predictedDifficulty: quest ? String(quest.predictedDifficulty || 5) : "5"
     };
     document.getElementById("f-amount").value = quest ? quest.amount || "" : "";
-    setPillSelected("f-category", formValues.category);
-    setPillSelected("f-difficulty", formValues.difficulty);
+    setMultiPillSelected("f-category", formValues.categories);
     setPillSelected("f-minutes", formValues.minutes);
     setPillSelected("f-moneyeffect", formValues.moneyEffect);
     setPillSelected("f-destination", formValues.destination);
@@ -891,33 +930,38 @@
     e.preventDefault();
     var title = document.getElementById("f-title").value.trim();
     if (!title) return;
-    var exp = calculateExp(formValues.difficulty, formValues.category);
+    var pd = parseInt(formValues.predictedDifficulty, 10) || 5;
+    var exp = calculateExp(pd);
+    var derivedDiff = pd <= 4 ? "低" : pd <= 6 ? "中" : "高";
+    var safeCategories = formValues.categories.length > 0 ? formValues.categories : ["本命"];
+    var primaryCat = safeCategories[0];
     var amount = formValues.moneyEffect === "none" ? 0 : (parseInt(document.getElementById("f-amount").value, 10) || 0);
     var now = nowIso();
-
     var enteringToday = formValues.destination === "today";
 
     if (editingQuestId) {
       var q = state.quests.find(function (x) { return x.id === editingQuestId; });
       var wasInToday = q.inToday;
       q.title = title;
-      q.category = formValues.category;
-      q.difficulty = formValues.difficulty;
+      q.categories = safeCategories;
+      q.category = primaryCat;
+      q.difficulty = derivedDiff;
       q.minutes = parseInt(formValues.minutes, 10);
       q.exp = exp;
       q.moneyEffect = formValues.moneyEffect;
       q.amount = amount;
       q.inToday = enteringToday;
       q.hidden = formValues.destination === "hidden";
-      q.predictedDifficulty = parseInt(formValues.predictedDifficulty, 10) || 5;
+      q.predictedDifficulty = pd;
       q.updatedAt = now;
       if (enteringToday && !wasInToday) q.order = nextTodayOrder();
     } else {
       var newQuest = {
         id: uid("q"),
         title: title,
-        category: formValues.category,
-        difficulty: formValues.difficulty,
+        categories: safeCategories,
+        category: primaryCat,
+        difficulty: derivedDiff,
         minutes: parseInt(formValues.minutes, 10),
         exp: exp,
         moneyEffect: formValues.moneyEffect,
@@ -926,7 +970,7 @@
         hidden: formValues.destination === "hidden",
         inToday: enteringToday,
         order: 0,
-        predictedDifficulty: parseInt(formValues.predictedDifficulty, 10) || 5,
+        predictedDifficulty: pd,
         difficultyHistory: [],
         createdAt: now,
         updatedAt: now
@@ -1155,23 +1199,36 @@
 
   var currentVaultId = "v1";
 
-  function relatedMoneyQuests(vaultId) {
-    return state.quests
-      .filter(function (q) { return q.moneyEffect !== "none" && (q.vaultId === vaultId || (!q.vaultId && vaultId === "v1")); })
-      .sort(function (a, b) { return new Date(b.updatedAt) - new Date(a.updatedAt); });
+  function vaultHistoryItems(vaultId) {
+    var primaryId = state.vaults[0] ? state.vaults[0].id : "v1";
+    return state.history.filter(function (h) {
+      if (!h.moneyEffect || h.moneyEffect === "none") return false;
+      var quest = state.quests.find(function (q) { return q.id === h.questId; });
+      if (quest) {
+        return (quest.vaultId || primaryId) === vaultId;
+      }
+      return vaultId === primaryId;
+    }).map(function (h) {
+      var quest = state.quests.find(function (q) { return q.id === h.questId; });
+      return quest ? Object.assign({}, h, { minutes: quest.minutes }) : h;
+    });
   }
 
   function moneyQuestItemHtml(q) {
     var rewardLabel = q.moneyEffect === "deposit" ? "金庫 +¥" + fmtMoney(q.amount) : q.moneyEffect === "saved" ? "守った額 +¥" + fmtMoney(q.amount) : "";
+    var tagsHtml =
+      '<span class="tag-pill">' + (q.category || "お金") + '</span>' +
+      '<span class="tag-diff diff-' + (q.difficulty || "低") + '">' + (q.difficulty || "低") + '</span>' +
+      (q.minutes ? '<span class="tag-time">' + iconHtml("clock", "tag-clock") + q.minutes + '分</span>' : '');
     return (
       '<li class="money-quest-item">' +
-      '<span class="money-quest-icon">' + iconHtml(CATEGORY_ICON[q.category]) + '</span>' +
+      '<span class="money-quest-icon">' + iconHtml(CATEGORY_ICON[q.category] || CATEGORY_ICON["お金"]) + '</span>' +
       '<span class="money-quest-body">' +
       '<span class="money-quest-title">' + q.title + '</span>' +
-      '<span class="money-quest-tags">' + questTagsHtml(q) + '</span>' +
+      '<span class="money-quest-tags">' + tagsHtml + '</span>' +
       '</span>' +
       '<span class="money-quest-reward">' +
-      '<span class="money-quest-exp">+' + q.exp + 'EXP</span>' +
+      '<span class="money-quest-exp">+' + (q.exp || 0) + 'EXP</span>' +
       (rewardLabel ? '<span class="money-quest-amount">' + rewardLabel + '</span>' : "") +
       '</span>' +
       '</li>'
@@ -1189,19 +1246,17 @@
     document.getElementById("vt-bar").style.width = topPct + "%";
     document.getElementById("vt-rest").textContent = fmtMoney(Math.max(0, vault.targetAmount - vault.currentAmount));
 
-    var nextMilestone = vault.milestones.find(function (m) { return m.amount > vault.currentAmount; });
-    document.getElementById("vt-nextMilestone").textContent = nextMilestone ? fmtMoney(nextMilestone.amount - vault.currentAmount) : "0";
-
     var msRow = document.getElementById("vt-milestones");
     msRow.innerHTML = "";
-    vault.milestones.forEach(function (m, i) {
-      var done = vault.currentAmount >= m.amount && i > 0;
-      var isCurrent = !done && m.amount > 0 && (i === 0 || vault.currentAmount >= vault.milestones[i - 1].amount);
-      var dot = document.createElement("div");
-      dot.className = "milestone-dot" + (done ? " done" : "") + (isCurrent ? " current" : "");
-      dot.innerHTML = '<span class="milestone-circle">' + (done ? "✓" : i + 1) + '</span><span class="milestone-label">¥' + (m.amount >= 1000 ? Math.round(m.amount / 1000) + "k" : m.amount) + '</span>';
-      msRow.appendChild(dot);
+    PCT_MILESTONES.forEach(function (p) {
+      var chip = document.createElement("div");
+      chip.className = "pct-chip" + (topPct >= p ? " reached" : "");
+      chip.textContent = p + "%";
+      msRow.appendChild(chip);
     });
+    var nextMsPct = PCT_MILESTONES.find(function (p) { return topPct < p; });
+    var nextMsRemain = nextMsPct != null ? Math.max(0, Math.round(vault.targetAmount * nextMsPct / 100) - vault.currentAmount) : 0;
+    document.getElementById("vt-nextMilestone").textContent = nextMsPct != null ? fmtMoney(nextMsRemain) : "0";
 
     document.getElementById("vt-savedMonth").textContent = fmtMoney(vault.savedAmountThisMonth);
     document.getElementById("vt-depositedMonth").textContent = fmtMoney(vault.depositedThisMonth);
@@ -1210,8 +1265,8 @@
 
     var recentList = document.getElementById("vt-recent-list");
     recentList.innerHTML = "";
-    relatedMoneyQuests(vault.id).slice(0, 3).forEach(function (q) {
-      recentList.insertAdjacentHTML("beforeend", moneyQuestItemHtml(q));
+    vaultHistoryItems(vault.id).slice(0, 3).forEach(function (h) {
+      recentList.insertAdjacentHTML("beforeend", moneyQuestItemHtml(h));
     });
   }
 
@@ -1246,32 +1301,36 @@
 
     var stepsEl = document.getElementById("vd-steps");
     stepsEl.innerHTML = "";
-    var currentStepIndex = 0;
-    vault.milestones.forEach(function (m, i) {
-      if (vault.currentAmount >= m.amount) currentStepIndex = i;
+    PCT_MILESTONES.forEach(function (p) {
+      var chip = document.createElement("div");
+      chip.className = "pct-chip" + (pct >= p ? " reached" : "");
+      chip.textContent = p + "%";
+      stepsEl.appendChild(chip);
     });
-    var nextStepIndex = Math.min(currentStepIndex + 1, vault.milestones.length - 1);
-    vault.milestones.forEach(function (m, i) {
-      var done = i <= currentStepIndex;
-      var isCurrent = i === nextStepIndex && !done;
-      var dot = document.createElement("div");
-      dot.className = "step-dot" + (done ? " done" : "") + (isCurrent ? " current" : "");
-      dot.innerHTML = '<span class="step-circle">' + (done ? "✓" : i + 1) + '</span><span class="step-label">' + m.label + '</span>';
-      stepsEl.appendChild(dot);
-    });
-    var nextMilestone = vault.milestones[nextStepIndex];
-    var remain = Math.max(0, nextMilestone.amount - vault.currentAmount);
-    document.getElementById("vd-nextStepLabel").textContent =
-      remain > 0 ? nextMilestone.label + "まであと ¥" + fmtMoney(remain) : nextMilestone.label + " 到達済み";
+    var nextMsPct = PCT_MILESTONES.find(function (p) { return pct < p; });
+    if (nextMsPct != null) {
+      var remain = Math.max(0, Math.round(vault.targetAmount * nextMsPct / 100) - vault.currentAmount);
+      document.getElementById("vd-nextStepLabel").textContent = nextMsPct + "%まであと ¥" + fmtMoney(remain);
+    } else {
+      document.getElementById("vd-nextStepLabel").textContent = "すべての節目に到達しました";
+    }
 
     document.getElementById("vd-deposited").textContent = fmtMoney(vault.depositedThisMonth);
     document.getElementById("vd-saved").textContent = fmtMoney(vault.savedAmountThisMonth);
-    var relatedQuests = relatedMoneyQuests(vault.id);
-    document.getElementById("vd-questCount").textContent = relatedQuests.length + "件";
+    var relatedItems = vaultHistoryItems(vault.id);
+    document.getElementById("vd-questCount").textContent = relatedItems.length + "件";
 
     var listEl = document.getElementById("vd-quest-list");
     listEl.innerHTML = "";
-    relatedQuests.forEach(function (q) { listEl.insertAdjacentHTML("beforeend", moneyQuestItemHtml(q)); });
+    if (relatedItems.length === 0) {
+      listEl.innerHTML =
+        '<li class="vault-quest-empty">' +
+        '<p class="vault-quest-empty-text">まだ金庫に効いたクエストはありません</p>' +
+        '<p class="vault-quest-empty-sub">金庫に積むか、守った額を記録するとここに残ります</p>' +
+        '</li>';
+    } else {
+      relatedItems.forEach(function (h) { listEl.insertAdjacentHTML("beforeend", moneyQuestItemHtml(h)); });
+    }
 
     var benefitsEl = document.getElementById("vd-benefits");
     benefitsEl.innerHTML = "";
@@ -1292,19 +1351,6 @@
     document.getElementById("ve-title").value = vault.title;
     document.getElementById("ve-target").value = vault.targetAmount;
     document.getElementById("ve-current").value = vault.currentAmount;
-    document.getElementById("ve-milestone-error").classList.add("hidden");
-
-    var msList = document.getElementById("ve-milestones");
-    msList.innerHTML = "";
-    vault.milestones.forEach(function (m, i) {
-      msList.insertAdjacentHTML(
-        "beforeend",
-        '<div class="milestone-edit-row">' +
-          '<span class="milestone-edit-label">' + m.label + '</span>' +
-          '<input type="number" class="milestone-edit-input" data-index="' + i + '" min="0" step="1" value="' + m.amount + '">' +
-          '</div>'
-      );
-    });
 
     var benefits = vault.benefits || [];
     document.getElementById("ve-benefit-0").value = benefits[0] || "";
@@ -1317,8 +1363,6 @@
   document.getElementById("vault-edit-form").addEventListener("submit", function (e) {
     e.preventDefault();
     var vault = getVault(currentVaultId);
-    var errorEl = document.getElementById("ve-milestone-error");
-    errorEl.classList.add("hidden");
 
     var title = document.getElementById("ve-title").value.trim();
     if (!title) return;
@@ -1329,23 +1373,9 @@
     var current = parseInt(document.getElementById("ve-current").value, 10);
     if (isNaN(current) || current < 0) return;
 
-    var milestoneInputs = document.querySelectorAll(".milestone-edit-input");
-    var newMilestoneAmounts = [];
-    for (var i = 0; i < milestoneInputs.length; i++) {
-      var raw = milestoneInputs[i].value;
-      var existing = vault.milestones[i].amount;
-      var amount = raw === "" ? existing : parseInt(raw, 10);
-      if (isNaN(amount) || amount < 0 || amount > target) {
-        errorEl.classList.remove("hidden");
-        return;
-      }
-      newMilestoneAmounts.push(amount);
-    }
-
     vault.title = title;
     vault.targetAmount = target;
     vault.currentAmount = current;
-    vault.milestones.forEach(function (m, i) { m.amount = newMilestoneAmounts[i]; });
     vault.benefits = [
       document.getElementById("ve-benefit-0").value.trim(),
       document.getElementById("ve-benefit-1").value.trim(),
@@ -1369,6 +1399,7 @@
 
   function recordVaultEntry(type, amount, label) {
     var vault = state.vaults[0];
+    var prevPct = Math.min(100, Math.floor((vault.currentAmount / vault.targetAmount) * 100));
     if (type === "deposit") {
       vault.currentAmount += amount;
       vault.depositedThisMonth += amount;
@@ -1376,6 +1407,16 @@
     } else {
       vault.savedAmountThisMonth += amount;
       state.weekStats.saved += amount;
+    }
+    var newPct = Math.min(100, Math.floor((vault.currentAmount / vault.targetAmount) * 100));
+    var reachedMilestone = null;
+    if (type === "deposit") {
+      PCT_MILESTONES.forEach(function (p) {
+        if (prevPct < p && newPct >= p && vault.reachedMilestones.indexOf(p) === -1) {
+          vault.reachedMilestones.push(p);
+          reachedMilestone = p;
+        }
+      });
     }
 
     state.totalExp += RECORD_EXP;
@@ -1398,7 +1439,7 @@
     state.streak.weekCompleted[(todayIdx + 6) % 7] = true;
 
     saveState();
-    return { exp: RECORD_EXP, mapResult: mapResult, vault: vault };
+    return { exp: RECORD_EXP, mapResult: mapResult, vault: vault, reachedMilestone: reachedMilestone };
   }
 
   function showToast(message) {
@@ -1471,6 +1512,12 @@
       ? "金庫 +¥" + fmtMoney(amount) + " / +" + result.exp + "EXP"
       : "守った額 +¥" + fmtMoney(amount) + " / +" + result.exp + "EXP";
     showToast(toastMsg);
+
+    if (result.reachedMilestone != null) {
+      setTimeout(function () {
+        showToast(result.reachedMilestone + "% — " + PCT_MILESTONE_MSGS[result.reachedMilestone]);
+      }, 2800);
+    }
   });
 
   /* ===================== RECORDS ===================== */

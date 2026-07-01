@@ -970,3 +970,27 @@ button{cursor:pointer;}
 .diff-eval-suggestion{font-size:12px;color:var(--text-dim);text-align:center;margin:6px 0 0;}
 /* ── pill-select wrap ── */
 .pill-select.wrap{flex-wrap:wrap;}
+
+/* ── vault quest empty state ── */
+.vault-quest-empty{list-style:none;padding:18px 0 10px;text-align:center;}
+.vault-quest-empty-text{font-size:13px;color:var(--text-dim);margin:0 0 4px;}
+.vault-quest-empty-sub{font-size:12px;color:var(--text-faint);margin:0;}
+
+/* ── cat filter row (shelf) ── */
+.cat-filter-row{display:flex;gap:6px;overflow-x:auto;padding:4px 16px 8px;margin:-4px -16px 0;scrollbar-width:none;}
+.cat-filter-row::-webkit-scrollbar{display:none;}
+.cat-filter-btn{flex-shrink:0;background:var(--bg-card-2);border:1px solid var(--border-soft);color:var(--text-dim);font-size:12px;font-weight:600;padding:5px 12px;border-radius:999px;white-space:nowrap;}
+.cat-filter-btn.active{background:var(--gold);border-color:var(--gold);color:var(--bg-base);}
+/* ── tag-pill-more ── */
+.tag-pill-more{font-size:10px;color:var(--text-faint);background:transparent;border:none;padding:0 2px;}
+/* ── field-label-sub ── */
+.field-label-sub{font-size:10px;color:var(--text-faint);font-weight:400;margin-left:4px;}
+/* ── pct milestone chips ── */
+.pct-milestone-row,.pct-milestone-chips{display:flex;gap:8px;margin-top:10px;justify-content:center;}
+.pct-chip{font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--text-faint);border:1px solid var(--border-soft);letter-spacing:0.02em;transition:background 0.2s,color 0.2s,border-color 0.2s;}
+.pct-chip.reached{background:rgba(217,179,95,0.16);color:var(--gold);border-color:rgba(217,179,95,0.38);}
+.vault-next-info{font-size:12px;color:var(--text-dim);margin:10px 0 0;text-align:center;}
+/* ── vault 100% glow ── */
+.vault-visual.vault-full .vault-led.lit{filter:drop-shadow(0 0 4px rgba(217,179,95,1)) brightness(1.5);}
+/* ── vault edit note ── */
+.field-sub-note{font-size:12px;color:var(--text-faint);margin:4px 0 12px;padding:0 4px;}

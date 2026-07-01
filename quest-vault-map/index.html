@@ -116,6 +116,14 @@
       <button class="tab-btn" data-shelf-tab="history"><span class="icon-slot icon-inline" data-icon="clock"></span> 使用履歴</button>
       <button class="tab-btn" data-shelf-tab="hidden"><span class="icon-slot icon-inline" data-icon="hidden"></span> 非表示</button>
     </div>
+    <div class="cat-filter-row">
+      <button class="cat-filter-btn active" data-cat-filter="">すべて</button>
+      <button class="cat-filter-btn" data-cat-filter="本命">本命</button>
+      <button class="cat-filter-btn" data-cat-filter="守り">守り</button>
+      <button class="cat-filter-btn" data-cat-filter="整え">整え</button>
+      <button class="cat-filter-btn" data-cat-filter="お金">お金</button>
+      <button class="cat-filter-btn" data-cat-filter="超軽">超軽</button>
+    </div>
 
     <section class="card">
       <div class="card-head">
@@ -148,22 +156,13 @@
       </label>
 
       <div class="field-block">
-        <span class="field-label">カテゴリ</span>
-        <div class="pill-select" id="f-category" data-name="category">
+        <span class="field-label">カテゴリ <span class="field-label-sub">複数選択可</span></span>
+        <div class="pill-select wrap" id="f-category" data-name="categories">
           <button type="button" data-value="本命">本命</button>
           <button type="button" data-value="守り">守り</button>
           <button type="button" data-value="整え">整え</button>
           <button type="button" data-value="お金">お金</button>
           <button type="button" data-value="超軽">超軽</button>
-        </div>
-      </div>
-
-      <div class="field-block">
-        <span class="field-label">難易度</span>
-        <div class="pill-select" id="f-difficulty" data-name="difficulty">
-          <button type="button" data-value="低">低</button>
-          <button type="button" data-value="中">中</button>
-          <button type="button" data-value="高">高</button>
         </div>
       </div>
 
@@ -197,7 +196,7 @@
 
       <div class="field-block">
         <span class="field-label">報酬</span>
-        <p class="reward-preview"><b id="f-reward-preview">+50</b>EXP（難易度で自動算出）</p>
+        <p class="reward-preview"><b id="f-reward-preview">+150</b>EXP（予想難易度で自動算出）</p>
       </div>
 
       <div class="field-block">
@@ -340,8 +339,8 @@
       <p class="vault-top-amount"><span id="vt-current">0</span> / <span id="vt-target">0</span></p>
       <div class="bar-track"><div class="bar-fill" id="vt-bar"></div></div>
       <p class="vault-mini-rest">あと ¥<span id="vt-rest">0</span></p>
-      <p class="vault-next-milestone"><span class="icon-slot icon-inline" data-icon="flag"></span> 次の節目まで ¥<span id="vt-nextMilestone">0</span></p>
-      <div class="milestone-row" id="vt-milestones"></div>
+      <div class="pct-milestone-row" id="vt-milestones"></div>
+      <p class="vault-next-milestone">次の節目まで ¥<span id="vt-nextMilestone">0</span></p>
       <span class="chevron-end">›</span>
     </section>
 
@@ -400,9 +399,9 @@
     </section>
 
     <section class="card">
-      <h2 class="card-heading">次の節目</h2>
-      <div class="step-track" id="vd-steps"></div>
-      <p class="map-mini-sub" id="vd-nextStepLabel">-</p>
+      <h2 class="card-heading">節目</h2>
+      <div class="pct-milestone-chips" id="vd-steps"></div>
+      <p class="vault-next-info" id="vd-nextStepLabel">-</p>
     </section>
 
     <section class="card">
@@ -462,11 +461,7 @@
         <input type="number" id="ve-current" placeholder="12000" min="0" step="1" required>
       </label>
 
-      <div class="field-block">
-        <span class="field-label">節目（金額のみ編集できます）</span>
-        <div class="milestone-edit-list" id="ve-milestones"></div>
-        <p class="form-error hidden" id="ve-milestone-error">節目金額は0以上、目標額以下にしてください</p>
-      </div>
+      <p class="field-sub-note">節目（25% / 50% / 75% / 100%）は目標額から自動で算出されます</p>
 
       <div class="field-block">
         <span class="field-label">手に入ること</span>
